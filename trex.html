@@ -58,6 +58,12 @@
         }
       }
 
+      function touchStarted() {
+        // Make the tRex jump on touchscreen tap
+        tRex.jump();
+        return false;
+      }
+
       class TRex {
         constructor() {
           this.x = 64;
