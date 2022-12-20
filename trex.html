@@ -1,0 +1,131 @@
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.min.js"></script>
+  </head>
+  <body>
+    <script>
+      let canvas;
+      let tRex;
+      let obstacles = [];
+      let score = 0;
+
+      function setup() {
+        canvas = createCanvas(400, 200);
+        tRex = new TRex();
+        frameRate(60);
+      }
+
+      function draw() {
+        background(220);
+
+        // Update and show the tRex
+        tRex.update();
+        tRex.show();
+
+        // Update and show the obstacles
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+          obstacles[i].update();
+          obstacles[i].show();
+
+          // Check if the tRex collides with any of the obstacles
+          if (tRex.hits(obstacles[i])) {
+            console.log('Game over!');
+            noLoop();
+          }
+
+          // Remove the obstacle if it goes off the screen
+          if (obstacles[i].offScreen()) {
+            obstacles.splice(i, 1);
+            score += 1;
+          }
+        }
+
+        // Add a new obstacle every 150 frames
+        if (frameCount % 150 == 0) {
+          obstacles.push(new Obstacle());
+        }
+
+        // Show the score
+        fill(0);
+        textSize(32);
+        text(score, 32, 32);
+      }
+
+      function keyPressed() {
+        // Make the tRex jump when the up arrow key is pressed
+        if (keyCode === UP_ARROW) {
+          tRex.jump();
+        }
+      }
+
+      class TRex {
+        constructor() {
+          this.x = 64;
+          this.y = height - 32;
+          this.width = 32;
+          this.height = 32;
+          this.velocity = 0;
+          this.gravity = 0.6;
+        }
+
+        update() {
+          // Apply gravity to the tRex's velocity
+          this.velocity += this.gravity;
+          // Clamp the tRex's velocity to a maximum value
+          this.velocity = constrain(this.velocity, -10, 10);
+          // Update the tRex's position based on its velocity
+          this.y += this.velocity;
+          // Keep the tRex on the screen
+          this.y = constrain(this.y, 0, height - this.height);
+        }
+
+        show() {
+          // Draw the tRex as a rectangle
+          fill(255, 0, 0);
+          rect(this.x, this.y, this.width, this.height);
+        }
+
+        jump() {
+          // Give the tRex a boost of upward velocity when it jumps
+          this.velocity -= 10;
+        }
+
+        hits(obstacle) {
+          // Check if the tRex collides with the given obstacle
+          return (
+            this.x < obstacle.x + obstacle.width &&
+            this.x + this.width > obstacle.x &&
+            this.y < obstacle.y + obstacle.height &&
+            this.y + this.height > obstacle.y
+          );
+        }
+      }
+
+      class Obstacle {
+        constructor() {
+          this.x = width;
+          this.y = height - 32;
+          this.width = 32;
+        this.height = 32;
+        this.speed = 5;
+      }
+
+      update() {
+        // Move the obstacle to the left
+        this.x -= this.speed;
+      }
+
+      show() {
+        // Draw the obstacle as a rectangle
+        fill(0, 0, 255);
+        rect(this.x, this.y, this.width, this.height);
+      }
+
+      offScreen() {
+        // Check if the obstacle has gone off the screen
+        return this.x < -this.width;
+       }
+      }
+    </script>
+  </body>
+</html>
